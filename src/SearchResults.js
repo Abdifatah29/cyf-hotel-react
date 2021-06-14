@@ -1,9 +1,9 @@
-import React from "react";
+import React, { useState } from "react";
+import moment from "moment";
 
-const checkDifference = (a, b) => {
-  let dt1 = new Date(a),
-    dt2 = new Date(b);
-  return Math.abs(dt2.getDate() - dt1.getDate());
+const styles = {
+  backgroundColor: "gray",
+  color: "red"
 };
 
 const TableHead = () => (
@@ -21,36 +21,44 @@ const TableHead = () => (
   </thead>
 );
 
-const SearchResults = ({ bookings }) => (
-  <table className="table table-striped">
-    <TableHead />
-    {Object.keys(bookings).map((item, key) => (
-      <tbody key={key}>
-        <tr>
-          <td>{bookings[item].title}</td>
-          <td>{bookings[item].firstName}</td>
-          <td>{bookings[item].surname}</td>
-          <td>{bookings[item].email}</td>
-          <td>{bookings[item].roomId}</td>
-          <td>{bookings[item].checkInDate}</td>
-          <td>{bookings[item].checkOutDate}</td>
-          <td>
-            {bookings[item].title +
-              " " +
-              bookings[item].firstName +
-              " " +
-              bookings[item].surname +
-              " has a booking for " +
-              checkDifference(
-                bookings[item].checkOutDate,
-                bookings[item].checkInDate
-              ) +
-              " nights"}
-          </td>
-        </tr>
-      </tbody>
-    ))}
-  </table>
-);
+const SearchResults = ({ bookings }) => {
+  const [hightlight, setHighlight] = useState(false);
+
+  const hightlightRow = () => setHighlight(!hightlight);
+
+  return (
+    <table className="table table-striped">
+      <TableHead />
+      {Object.keys(bookings).map((item, key) => {
+        let date1 = moment(bookings[item].checkInDate);
+        let date2 = moment(bookings[item].checkOutDate);
+
+        return (
+          <tbody className="tbody" key={key}>
+            <tr style={hightlight ? styles : null} onClick={hightlightRow}>
+              <td>{bookings[item].title}</td>
+              <td>{bookings[item].firstName}</td>
+              <td>{bookings[item].surname}</td>
+              <td>{bookings[item].email}</td>
+              <td>{bookings[item].roomId}</td>
+              <td>{bookings[item].checkInDate}</td>
+              <td>{bookings[item].checkOutDate}</td>
+              <td>
+                {bookings[item].title +
+                  " " +
+                  bookings[item].firstName +
+                  " " +
+                  bookings[item].surname +
+                  " has a booking for " +
+                  date2.diff(date1, "days") +
+                  " nights"}
+              </td>
+            </tr>
+          </tbody>
+        );
+      })}
+    </table>
+  );
+};
 
 export default SearchResults;
